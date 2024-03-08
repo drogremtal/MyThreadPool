@@ -61,6 +61,7 @@ namespace MyThreadPool
                         }
                         else
                         {
+                            Monitor.Wait(_sysRoot);///Режим ожидания
                             continue;
                         }
                     }
@@ -78,7 +79,6 @@ namespace MyThreadPool
 
         static void Main(string[] args)
         {
-
 
             MyThreadPool myThreadPool = new MyThreadPool(1);
 
