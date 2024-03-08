@@ -12,6 +12,8 @@ namespace MyThreadPool
             private readonly Queue<Action> _queue;
             private readonly Thread[] _thread;
 
+            private readonly object _sysRoot = new object();
+
             public MyThreadPool(int ThreadCount = 4)
             {
                 _thread = new Thread[ThreadCount];
@@ -29,17 +31,19 @@ namespace MyThreadPool
             }
             public void Queue(Action action)
             {
-                Monitor.Enter(_queue);
+
+
+                Monitor.Enter(_sysRoot);
                 try
                 {
-
+                    _queue.Enqueue(action);
                 }
-                finally 
+                finally
                 {
-                    
+                    Monitor.Exit(_sysRoot);
                 }
 
-                _queue.Enqueue(action);
+
             }
 
 
@@ -48,12 +52,19 @@ namespace MyThreadPool
                 Action action;
                 while (true)
                 {
-                    if (_queue.Count > 0)
+                    try
                     {
-                        action = _queue.Dequeue();
+                        Monitor.Enter(_sysRoot);
+                        if (_queue.Count > 0)
+                        {
+                            action = _queue.Dequeue();
+                        }
+                        else
+                        {
+                            continue;
+                        }
                     }
-                    else { continue; }
-          
+                    finally { Monitor.Exit(_sysRoot); }
                     action();
                 }
 
