@@ -34,10 +34,9 @@ namespace MyThreadPool
                 {
 
                 }
-                catch (Exception)
+                finally 
                 {
-
-                    throw;
+                    
                 }
 
                 _queue.Enqueue(action);
